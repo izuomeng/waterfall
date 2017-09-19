@@ -4,56 +4,21 @@
 ## css方法：
 #### 1.column-count
 ```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-    <style>
-       .content{
-            column-count: 6;
-       }
-       .item{
-           break-inside: avoid;
-           background-color: lightgreen;
-           margin-bottom: 10px;
-       }
-    </style>
-</head>
+<style>
+   .content{
+        column-count: 6;
+   }
+   .item{
+       break-inside: avoid;
+       background-color: lightgreen;
+       margin-bottom: 10px;
+   }
+</style>
 <body>
     <div class="content">
         <div class="item"></div>
         <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
+        <!-- ...more items... -->
     </div>
 
     <script>
@@ -70,59 +35,39 @@
 
 #### 2.flex
 ```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-    <style>
-       .content{
-            display: flex;
-            justify-content: space-around;
-       }
-       .column{
-           display: flex;
-           flex-flow: column;
-           width: 24%
-       }
-       .item{
-           width: 100%;
-           background-color: lightgreen;
-           margin-bottom: 10px;
-       }
-    </style>
-</head>
+<style>
+   .content{
+        display: flex;
+        justify-content: space-around;
+   }
+   .column{
+       display: flex;
+       flex-flow: column;
+       width: 24%
+   }
+   .item{
+       width: 100%;
+       background-color: lightgreen;
+       margin-bottom: 10px;
+   }
+</style>
 <body>
     <div class="content">
         <div class="column">
             <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
+            <!-- ...more items... -->
         </div>
         <div class="column">
             <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
+            <!-- ...more items... -->
         </div>
         <div class="column">
             <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
+            <!-- ...more items... -->
         </div>
         <div class="column">
             <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
+            <!-- ...more items... -->
         </div>
     </div>
 
