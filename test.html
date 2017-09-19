@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+       .content{
+            width: 100%;
+            position: relative;
+            height: 800px
+       }
+       .item{
+           width: 200px;
+           position: absolute;
+       }
+    </style>
+</head>
+<body>
+    <div class="content" id="1"></div>
+
+    <script>
+        var Waterfall = (function (){
+            var Waterfall = function (content, boxClass, margin) {
+                var contentWidth = content.offsetWidth,
+                    max,
+                    boxWidth,
+                    div = document.createElement('div')
+                div.className = boxClass
+                div.style.display = 'none'
+                document.body.appendChild(div)
+                boxWidth = parseInt(getComputedStyle(div).width)    //每个图片盒子宽度
+                max = parseInt(contentWidth/boxWidth)   //最大列数
+                this.space = contentWidth % boxWidth    //两侧的空白区域
+                this.content = content
+                this.boxClass = boxClass
+                this.boxWidth = boxWidth
+                this.columnHeight = Array(max).fill(0)  //保存每一列的最小高度值
+            }
+            Waterfall.prototype = {
+                constructor: Waterfall,
+                //添加图片方法，参数是要添加的张数，没有默认20张
+                addImg: function(number) {  
+                    number = number || 20
+                    var frag = document.createDocumentFragment(),
+                        div,
+                        len = this.content.children.length
+                    for(var i = 0; i < number; i++){
+                        div = document.createElement('div')
+                        div.innerHTML = len + i
+                        div.className = this.boxClass
+                        div.style.backgroundColor = '#' + Math.random().toString(16).slice(2, 8)
+                        div.style.height = parseInt(Math.random() * 200 + 200) + 'px'
+                        frag.appendChild(div)
+                    }
+                    this.content.appendChild(frag)
+                    this.shake(len) //把添加进来的新图片按照瀑布流重新排列
+                    return this
+                },
+                //布局方法，参数是布局开始的起始为止，这样就不用每次添加新图片整个重新布局，节省了性能
+                shake: function(start) {
+                    var children = this.content.children
+                    for(var i = start; i < children.length; i++){
+                        var min = findMin(this.columnHeight)    //找到所有列中高度最小的值和索引
+                        children[i].style.top = min.value + 'px'
+                        children[i].style.left = min.index * this.boxWidth + this.space/2 + 'px'
+                        this.columnHeight[min.index] += children[i].offsetHeight   //更新列高度数组
+                    }
+                    this.content.style.height = findMax(this.columnHeight) + 'px'   //维护父容器的高度
+                },
+                //初始化，绑定监听事件，滚动到底部加载更多图片，resize窗口时重新布局
+                init: function() {
+                    var tid1,
+                        tid2,
+                        body = document.body,
+                        self = this
+                    self.addImg(30)
+                    function $scroll(){
+                        //函数截流
+                        clearTimeout(tid1)
+                        tid2 = setTimeout(function(){
+                            if(body.scrollTop + window.innerHeight >= body.offsetHeight){
+                                self.addImg(20)
+                            }
+                        }, 200)
+                    }
+                    function $resize(){
+                        clearTimeout(tid2)
+                        tid2 = setTimeout(function(){
+                            //调整窗口大小时相应的参数也要改变
+                            var contentWidth = self.content.offsetWidth,
+                                max = parseInt(contentWidth/self.boxWidth)
+                            self.columnHeight = Array(max).fill(0)
+                            self.space = contentWidth % self.boxWidth
+                            self.shake(0)
+                        }, 200)
+                    }
+                    document.addEventListener('scroll', $scroll)
+                    window.addEventListener('resize', $resize)
+                },
+                //移除监听事件
+                remove: function() {
+                    document.removeEventListener('scroll', $scroll)
+                    window.removeEventListener('resize', $resize)
+                }
+            }
+            //辅助函数，找到ary数组中的最小值和索引，返回值是个对象
+            function findMin(ary){
+                var min = {value: ary[0], index: 0}
+                for(var i = 1; i < ary.length; i++){
+                    if(min.value > ary[i]){
+                        min.value = ary[i]
+                        min.index = i
+                    }
+                }
+                return min
+            }
+            //辅助函数，返回数组最大值
+            function findMax(ary){
+                var max = 0
+                for(var i = 0; i < ary.length; i++){
+                    if(max < ary[i]){
+                        max = ary[i]
+                    }
+                }
+                return max
+            }
+            return Waterfall
+        })()
+        
+        var waterfall = new Waterfall(document.getElementById('1'), 'item')
+        waterfall.init()
+    </script>
+</body>
+</html>
