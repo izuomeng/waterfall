@@ -85,15 +85,11 @@
 #### js代码
 ```javascript
 var Waterfall = (function (){
+   var $scroll,
+       $resize
    var Waterfall = function (content, boxClass) {
        var contentWidth = content.offsetWidth,
-           max,
-           boxWidth,
-           div = document.createElement('div')
-       div.className = boxClass
-       div.style.display = 'none'
-       document.body.appendChild(div)
-       boxWidth = parseInt(getComputedStyle(div).width)    //每个图片盒子宽度
+           boxWidth = getWidth(boxClass)   //获取boxClass类的宽度
        this.max = parseInt(contentWidth/boxWidth)   //最大列数
        this.space = contentWidth % boxWidth    //两侧的空白区域
        this.content = content
@@ -142,7 +138,7 @@ var Waterfall = (function (){
                body = document.body,
                self = this
            self.addImg(30)
-           function $scroll(){
+           $scroll = function() {
                //函数截流
                clearTimeout(tid1)
                tid2 = setTimeout(function(){
@@ -151,7 +147,7 @@ var Waterfall = (function (){
                    }
                }, 200)
            }
-           function $resize(){
+           $resize = function() {
                clearTimeout(tid2)
                tid2 = setTimeout(function(){
                    //调整窗口大小时相应的参数也要改变
@@ -171,8 +167,15 @@ var Waterfall = (function (){
            window.removeEventListener('resize', $resize)
        }
    }
+   function getWidth(boxClass) {
+       var div = document.createElement('div')
+       div.className = boxClass
+       div.style.display = 'none'
+       document.body.appendChild(div)
+       return parseInt(getComputedStyle(div).width)
+   }
    //辅助函数，找到ary数组中的最小值和索引，返回值是个对象
-   function findMin(ary){
+   function findMin(ary) {
        var min = {value: ary[0], index: 0}
        for(var i = 1; i < ary.length; i++){
            if(min.value > ary[i]){
@@ -183,7 +186,7 @@ var Waterfall = (function (){
        return min
    }
    //辅助函数，返回数组最大值
-   function findMax(ary){
+   function findMax(ary) {
        var max = 0
        for(var i = 0; i < ary.length; i++){
            if(max < ary[i]){
