@@ -85,7 +85,7 @@
 #### js代码
 ```javascript
 var Waterfall = (function (){
-   var Waterfall = function (content, boxClass, margin) {
+   var Waterfall = function (content, boxClass) {
        var contentWidth = content.offsetWidth,
            max,
            boxWidth,
@@ -94,20 +94,19 @@ var Waterfall = (function (){
        div.style.display = 'none'
        document.body.appendChild(div)
        boxWidth = parseInt(getComputedStyle(div).width)    //每个图片盒子宽度
-       max = parseInt(contentWidth/boxWidth)   //最大列数
+       this.max = parseInt(contentWidth/boxWidth)   //最大列数
        this.space = contentWidth % boxWidth    //两侧的空白区域
        this.content = content
        this.boxClass = boxClass
        this.boxWidth = boxWidth
-       this.columnHeight = Array(max).fill(0)  //保存每一列的最小高度值
+       this.columnHeight = Array(this.max).fill(0)  //保存每一列的最小高度值
    }
    Waterfall.prototype = {
        constructor: Waterfall,
        //添加图片方法，参数是要添加的张数，没有默认20张
        addImg: function(number) {  
            number = number || 20
-           var frag = document.createDocumentFragment(),
-               div,
+           var div,
                len = this.content.children.length
            for(var i = 0; i < number; i++){
                div = document.createElement('div')
@@ -115,22 +114,26 @@ var Waterfall = (function (){
                div.className = this.boxClass
                div.style.backgroundColor = '#' + Math.random().toString(16).slice(2, 8)
                div.style.height = parseInt(Math.random() * 200 + 200) + 'px'
-               frag.appendChild(div)
+               this.content.appendChild(div)
+               this.shakeOne(div)
            }
-           this.content.appendChild(frag)
-           this.shake(len) //把添加进来的新图片按照瀑布流重新排列
            return this
        },
-       //布局方法，参数是布局开始的起始为止，这样就不用每次添加新图片整个重新布局，节省了性能
-       shake: function(start) {
-           var children = this.content.children
-           for(var i = start; i < children.length; i++){
-               var min = findMin(this.columnHeight)    //找到所有列中高度最小的值和索引
-               children[i].style.top = min.value + 'px'
-               children[i].style.left = min.index * this.boxWidth + this.space/2 + 'px'
-               this.columnHeight[min.index] += children[i].offsetHeight   //更新列高度数组
-           }
+       //设置添加单个图片的位置符合瀑布流规则
+       shakeOne: function(element) {
+           var min = findMin(this.columnHeight),    //找到所有列中高度最小的值和索引
+               margin = this.space / (this.max + 1)
+           element.style.top = min.value  + 'px'
+           element.style.left = min.index * (this.boxWidth + margin) + margin + 'px'
+           this.columnHeight[min.index] += (element.offsetHeight + margin)  //更新列高度数组
            this.content.style.height = findMax(this.columnHeight) + 'px'   //维护父容器的高度
+       },
+       //整个页面重新布局
+       refresh: function() {
+           var children = this.content.children
+           for(var i = 0; i < children.length; i++){
+               this.shakeOne(children[i])
+           }
        },
        //初始化，绑定监听事件，滚动到底部加载更多图片，resize窗口时重新布局
        init: function() {
@@ -152,11 +155,11 @@ var Waterfall = (function (){
                clearTimeout(tid2)
                tid2 = setTimeout(function(){
                    //调整窗口大小时相应的参数也要改变
-                   var contentWidth = self.content.offsetWidth,
-                       max = parseInt(contentWidth/self.boxWidth)
-                   self.columnHeight = Array(max).fill(0)
+                   var contentWidth = self.content.offsetWidth
+                   self.max = parseInt(contentWidth/self.boxWidth)
+                   self.columnHeight = Array(self.max).fill(0)
                    self.space = contentWidth % self.boxWidth
-                   self.shake(0)
+                   self.refresh()
                }, 200)
            }
            document.addEventListener('scroll', $scroll)
